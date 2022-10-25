@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: update-pmml
+  name: update-pmml
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: update-pmml
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: update-pmml
+    spec:
+      serviceAccountName: {{ include "update-ppml.serviceAccountName" . }}
+      containers:
+        - image: update-pmml:2.3
+          name: update-pmml
+          command:
+            - "/bin/bash"
+            - "-c"
+            - |
+              python3 /code/main.py \
+              --configmap-name "demo" \
+              --configmap-namespace "default" \
+              --kafka-bootstrap-servers "kafka.default.svc.cluster.local" \
+              --kafka-topic-name "my_favorite_topic" \
+              --deployment-name "curl" \
+              --deployment-namespace "default"
+          resources: {}
